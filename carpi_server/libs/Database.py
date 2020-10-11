@@ -112,7 +112,8 @@ class Database(object):
             "description": description,
             "created": self.get_date(),
             "lastUpdated": self.get_timestamp(),
-            "downloads": 0
+            "downloads": 0,
+            "version": 1
         })
 
     def delete_module(self, name) -> bool:
