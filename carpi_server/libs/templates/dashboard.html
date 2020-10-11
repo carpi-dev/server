@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+    <h2>Module statistics</h2>
+    {% if notEnoughData %}
+    <div class="alert alert-warning">We have not acquired enough data to display statistics here.</div>
+    {% else %}
+    <canvas id="moduleCreationTimeline" height="400px"></canvas>
+    <canvas id="moduleDownloadTimeline" height="400px"></canvas>
+    {% endif %}
+</div>
+
+<script src="/static/js/chart.js"></script>
+{% if not notEnoughData %}
+<script>
+let mct = $('#moduleCreationTimeline')
+let mctc = new Chart(mct, {
+    type: "line",
+    label: "Modules created over the last {{ moduleCreationTimelineTimespan }}",
+    data: [{% for unit, count in moduleCreation.items() %}{x: "{{ unit }}", y: {{ count }}}{% if not unit|last %},{% endif %}{% endfor %}]
+})
+
+let mdt = $('#moduleDownloadTimeline')
+let mdtc = new Chart(mdt, {
+    type: "line",
+    label: "Module downloads over the last {{ moduleDownloadTimelineTimespan }}",
+    data: [{% for unit, count in moduleDownloads.items() %}{x: "{{ unit }}", y: {{ count }}}{% if not unit|last %},{% endif %}{% endfor %}]
+})
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% import "functions.html" as func %}
+
+{% block body %}
+{{ func.emptyModal("newModuleModal", "Create new module") }}
+
+<div class="container">
+    <form class="form-inline">
+        <div class="form-group">
+            <input type="text" class="form-control" name="name" placeholder="Module name" id="moduleName">
+        </div>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a class="btn btn-primary" data-toggle="modal" data-target="#newModuleModal" onclick="onNewModule()">+</a>
+    </form>
+    &nbsp;&nbsp;
+    {% if modules|length > 0 %}
+    <table class="table">
+        <thead>
+            <th scope="col">#</th>
+            {% for key in modules[0].keys() %}
+            <th scope="col">{{ key }}</th>
+            {% endfor %}
+        </thead>
+        <tbody>
+        {% for module in modules %}
+            <th scope="row"> {{ module|e }}</th>
+            {% for k in module.keys() %}
+            <th>{{ module[k] }}</th>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+<script>
+    let nmm = $('#newModuleModal');
+    let nmmb = $('#newModuleModal-body')
+
+    function appendInput(to, id, name, placeholder, type="text"){
+        let d = document.createElement("div")
+        d.classList.add("form-group")
+        let i = document.createElement("input")
+        i.type = type
+        i.classList.add("form-control")
+        i.name = name
+        i.placeholder = placeholder
+        i.id = id
+        d.appendChild(i)
+        d.appendChild(document.createElement("br"))
+        to.appendChild(d)
+    }
+
+    function appendMultiLineInput(to, id, description){
+        let d = document.createElement("div")
+        d.classList.add("input-group")
+        let igp = document.createElement("div")
+        igp.classList.add("input-group-prepend")
+        d.appendChild(igp)
+        let igt = document.createElement("span")
+        igt.classList.add("input-group-text")
+        igt.innerText = description
+        igp.appendChild(igt)
+        let ta = document.createElement("textarea")
+        ta.classList.add("form-control")
+        ta.id = id
+        d.appendChild(ta)
+        d.appendChild(document.createElement("br"))
+        to.appendChild(d)
+    }
+
+    function appendButton(to, id, text, func) {
+        let d = document.createElement("a")
+        d.onclick = func
+        d.classList.add("btn", "btn-primary")
+        d.textContent = text
+        d.id = id
+        to.appendChild(document.createElement("br"))
+        to.appendChild(d)
+    }
+
+    function populateModal(){
+        let bodyDataId = "#newModuleModal-bodyData"
+        let nmmbd = document.getElementById(bodyDataId)
+        if(nmmbd === null) {
+            let nmmbd = document.createElement("div")
+            nmmbd.id = bodyDataId
+            nmmb.append(nmmbd)
+            let bdf = document.createElement("form")
+            appendInput(bdf, "dataFormModuleName", "name", "Module name")
+            appendInput(bdf, "dataFormModuleSource", "source", "Git repo")
+            appendMultiLineInput(bdf, "dataFormModuleDescription", "Description:")
+            appendButton(bdf, "dataFormModuleSaveButton", "Save", onDataFormModuleSaveButtonClicked)
+            nmmbd.appendChild(bdf)
+        }
+    }
+
+    function onNewModule(){
+        $.getJSON("/api/module/" + $('#moduleName').val(), null, function(data){
+            if(Object.keys(data).length > 0){
+                nmmb.innerHTML += '<div class="alert alert-danger" id="moduleExistsAlert">A module with the name ' + data["name"] + ' already exists.</div>'
+            } else {
+                let alert = $('#moduleExistsAlert')
+                if(alert.length) alert.remove()
+            }
+            populateModal()
+        });
+    }
+
+    function onDataFormModuleSaveButtonClicked(){
+        console.log("save me")
+    }
+
+    function onNewModuleModalOpened(){
+
+    }
+</script>
+
+{% endblock %}

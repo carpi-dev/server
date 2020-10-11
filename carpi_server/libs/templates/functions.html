@@ -1,0 +1,65 @@
+{% macro printList(lst) %}
+{% for item in lst %}
+{{ item }}{% if loop.nextitem is defined %}, {% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% macro menu_item(name, link) %}
+<li class="nav-item {% if name == title %}active{% endif %}"><a class="nav-link" href="{{ link }}">{{ name }}</a></li>
+{% endmacro %}
+
+{% macro buildMenu(items) %}
+{% for item in items %}
+    {{ menu_item(item, "/" + item) }}
+{% endfor %}
+{% endmacro %}
+
+{% macro buildNavDropdown(id, text, lst, url, urlPrefix="/") %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" id="{{ id }}NavDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ text }}</a>
+    <div class="dropdown-menu" aria-labelledby="{{ id }}NavDropdown">
+        {% for i in lst %}<a class="dropdown-item" href="{{ urlPrefix }}{{ i }}">{{ i }}</a>{% endfor %}
+    </div>
+</li>
+{% endmacro %}
+
+{% macro emptyModal(id, title=None) %}
+<div class="modal" tabindex="-1" role="dialog" id="{{ id }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                {% if title %}<h5 class="modal-title">{{ title }}</h5>{% endif %}
+                <button type="button" class="close" data-dismiss="modal" aria-label="close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body" id="{{ id }}-body"></div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro buildCarousel(id, lst, toggleable=False, active=False, style="") %}
+<div id="{{ id }}Carousel" class="carousel slide{% if toggleable %}{% if active %}  collapse {% else %} show{% endif %}{% endif %}" style="{{ style }}" data-ride="carousel">
+    <ol class="carousel-indicators">
+        {% for i in lst %}<li data-target="#{{ id }}Carousel" data-slide-to="{{ loop.index0 }}" class="{% if loop.index0 == 0 %}active{% endif %}">{% endfor %}
+    </ol>
+    <div class="carousel-inner">
+        {% for i in lst %}
+        <div class="carousel-item{% if loop.index0 == 0 %} active{% endif %}">
+            {% if i.show is defined %}{{ i.show }}{% else %}<img src="/img/default.png" class="d-block w-100">{% endif %}
+            <div class="carousel-caption d-none d-md-block">
+                <h5><a href="https://github.com/smthnspcl/{{ i.title }}">{{ i.title }}</a></h5>
+                <p>{{ i.description }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="carousel-control-prev" href="#{{ id }}Carousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">previous</span>
+        </div>
+        <div class="carousel-control-next" href="#{{ id }}Carousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">next</span>
+        </div>
+    </div>
+</div>
+{% endmacro %}
